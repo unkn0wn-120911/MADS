@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "755356292301",
+    "project_id": "gen-lang-client-0661980375",
+    "storage_bucket": "gen-lang-client-0661980375.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755356292301:android:f904eaaf94d6bf5a340584",
+        "android_client_info": {
+          "package_name": "com.mads.neuralcore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755356292301-rn3s74hba7uhj8fp8tmdeb298307n2mr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkvroaGDd20Pf5ms8wIRl0PRU3ggoaJwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755356292301-rn3s74hba7uhj8fp8tmdeb298307n2mr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
