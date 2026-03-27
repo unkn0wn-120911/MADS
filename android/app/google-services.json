@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "755356292301-inc7i2aofvq44rt6nsngen22lppu8ok5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mads.neuralcore",
+            "certificate_hash": "c19bdb47e170f7d99d51f6d0cd9b77948d016d9e"
+          }
+        },
+        {
           "client_id": "755356292301-rn3s74hba7uhj8fp8tmdeb298307n2mr.apps.googleusercontent.com",
           "client_type": 3
         }
