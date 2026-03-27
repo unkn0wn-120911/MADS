@@ -4,7 +4,8 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { generateLlamaResponse } from '../lib/llama';
 import { generateId } from '../lib/utils';
 import { GoogleGenAI } from "@google/genai";
-import { db, auth, handleFirestoreError, OperationType } from '../firebase';
+import { db, auth, handleFirestoreError, OperationType, signInWithGoogleNative } from '../firebase';
+import { Capacitor } from '@capacitor/core';
 import { SEED_DATA } from '../lib/seedData';
 import { MadsNeuralCore } from '../lib/madsBrain';
 import { 
@@ -370,6 +371,11 @@ export function useChat() {
 
   const login = async () => {
     try {
+      if (Capacitor.isNativePlatform()) {
+        await signInWithGoogleNative();
+        return true;
+      }
+      
       const provider = new GoogleAuthProvider();
       // Try popup first
       try {

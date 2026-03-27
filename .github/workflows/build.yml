@@ -51,6 +51,11 @@ jobs:
           cd android
           gradle assembleDebug
 
+      - name: Get Signing Report
+        run: |
+          cd android
+          gradle signingReport
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

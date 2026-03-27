@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import * as firebaseConfigRaw from '../firebase-applet-config.json';
 
 const firebaseConfig = (firebaseConfigRaw as any).default || firebaseConfigRaw;
@@ -8,6 +10,18 @@ const firebaseConfig = (firebaseConfigRaw as any).default || firebaseConfigRaw;
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
+
+export const signInWithGoogleNative = async () => {
+  if (Capacitor.isNativePlatform()) {
+    const result = await FirebaseAuthentication.signInWithGoogle();
+    if (result.credential?.idToken) {
+      const credential = GoogleAuthProvider.credential(result.credential.idToken);
+      return await signInWithCredential(auth, credential);
+    }
+    throw new Error("No ID token received from native Google Sign-In");
+  }
+  return null;
+};
 
 export enum OperationType {
   CREATE = 'create',
