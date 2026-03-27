@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#f9fafb] text-gray-900 antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-sm border border-gray-200;
+}
+
+.sidebar {
+  @apply bg-gray-50 border-r border-gray-200;
+}
+
+.message-user {
+  @apply bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 sm:px-5 py-3 shadow-sm;
+}
+
+.message-user.prose,
+.message-user p,
+.message-user h1,
+.message-user h2,
+.message-user h3,
+.message-user h4,
+.message-user h5,
+.message-user h6,
+.message-user strong,
+.message-user blockquote {
+  @apply text-white;
+}
+
+.message-user.prose code {
+  @apply bg-blue-700 text-blue-50;
+}
+
+.message-bot {
+  @apply bg-white text-gray-800 rounded-2xl rounded-tl-sm px-4 sm:px-5 py-4 shadow-sm border border-gray-100;
+}
+
+.input-area {
+  @apply bg-white border border-gray-300 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white rounded-xl px-4 py-2 font-medium hover:bg-blue-700 transition-colors shadow-sm;
+}
+
+.btn-secondary {
+  @apply bg-white border border-gray-300 text-gray-700 rounded-xl px-4 py-2 font-medium hover:bg-gray-50 transition-colors shadow-sm;
+}
+
+.btn-icon {
+  @apply p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors;
+}
+
+.pill-button {
+  @apply px-4 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 text-sm font-medium transition-all hover:bg-gray-50 hover:border-gray-300;
+}
+
+.pill-button-active {
+  @apply bg-blue-50 text-blue-700 border-blue-200;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+}
+
+.prose {
+  @apply max-w-none text-gray-800;
+}
+
+.prose code {
+  @apply bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono text-sm;
+}
+
+.prose pre {
+  @apply bg-gray-900 border border-gray-800 rounded-xl p-4 my-4 overflow-x-auto text-gray-100;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-blue-500 bg-blue-50 p-4 italic rounded-r-xl my-4 text-gray-700;
+}
+

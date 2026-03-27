@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A chat session between user and MADS.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single message in a conversation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "conversationId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "content": { "type": "string" },
+        "type": { "type": "string" },
+        "metadata": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "conversationId", "role", "content", "createdAt"]
+    },
+    "Knowledge": {
+      "title": "Knowledge",
+      "description": "A learned fact or topic in the database.",
+      "type": "object",
+      "properties": {
+        "topic": { "type": "string" },
+        "content": { "type": "string" },
+        "source": { "type": "string" },
+        "learnedAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["topic", "content", "learnedAt", "userId"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "User feedback on a message.",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string" },
+        "isPositive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["messageId", "isPositive", "createdAt"]
+    },
+    "LearningPath": {
+      "title": "LearningPath",
+      "description": "A structured learning journey for a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "goal": { "type": "string" },
+        "level": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] },
+        "status": { "type": "string", "enum": ["active", "completed", "paused"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "goal", "level", "status", "createdAt"]
+    },
+    "LearningStep": {
+      "title": "LearningStep",
+      "description": "A single step within a learning path.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "pathId": { "type": "string" },
+        "order": { "type": "integer" },
+        "title": { "type": "string" },
+        "explanation": { "type": "string" },
+        "practiceProblem": { "type": "string" },
+        "resources": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["locked", "available", "completed"] },
+        "userPerformance": { "type": "object" }
+      },
+      "required": ["id", "pathId", "order", "title", "status"]
+    },
+    "SharedNote": {
+      "title": "SharedNote",
+      "description": "A user-shared note or explanation for collaborative learning.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "topic": { "type": "string" },
+        "content": { "type": "string" },
+        "upvotes": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "authorName", "topic", "content", "upvotes", "createdAt"]
+    },
+    "SharedNoteVote": {
+      "title": "SharedNoteVote",
+      "description": "A user's vote on a shared note.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "noteId": { "type": "string" },
+        "value": { "type": "integer" }
+      },
+      "required": ["userId", "noteId", "value"]
+    }
+  },
+  "firestore": {
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "Conversation" },
+      "description": "Conversations collection"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Messages subcollection"
+    },
+    "/knowledge/{docId}": {
+      "schema": { "$ref": "Knowledge" },
+      "description": "Knowledge base collection"
+    },
+    "/feedback/{docId}": {
+      "schema": { "$ref": "Feedback" },
+      "description": "Feedback collection"
+    },
+    "/learningPaths/{pathId}": {
+      "schema": { "$ref": "LearningPath" },
+      "description": "Learning paths collection"
+    },
+    "/learningPaths/{pathId}/steps/{stepId}": {
+      "schema": { "$ref": "LearningStep" },
+      "description": "Steps subcollection"
+    },
+    "/sharedNotes/{noteId}": {
+      "schema": { "$ref": "SharedNote" },
+      "description": "Shared notes collection"
+    },
+    "/sharedNoteVotes/{voteId}": {
+      "schema": { "$ref": "SharedNoteVote" },
+      "description": "Votes on shared notes"
+    }
+  }
+}

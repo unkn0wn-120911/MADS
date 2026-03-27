@@ -1,0 +1,209 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: conversations
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - title: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: messages (subcollection of conversations)
+    // Fields:
+    //   - id: string (required)
+    //   - conversationId: string (required)
+    //   - role: string (required)
+    //   - content: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: knowledge
+    // Fields:
+    //   - topic: string (required)
+    //   - content: string (required)
+    //   - source: string
+    //   - learnedAt: timestamp (required)
+    //   - userId: string (required)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required)
+    //   - displayName: string
+    //   - role: string
+    //
+    // Collection: learningPaths
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - goal: string (required)
+    //   - level: string (required)
+    //   - status: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: steps (subcollection of learningPaths)
+    // Fields:
+    //   - id: string (required)
+    //   - pathId: string (required)
+    //   - order: int (required)
+    //   - title: string (required)
+    //   - status: string (required)
+    //
+    // Collection: sharedNotes
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - authorName: string (required)
+    //   - topic: string (required)
+    //   - content: string (required)
+    //   - upvotes: int (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: sharedNoteVotes
+    // Fields:
+    //   - userId: string (required)
+    //   - noteId: string (required)
+    //   - value: int (required)
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "an0n.lucifer.contact@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidKnowledge(data) {
+      return data.topic is string && data.topic.size() > 0 && data.topic.size() < 500 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 100000 &&
+             data.learnedAt is timestamp && 
+             data.userId is string;
+    }
+
+    function isValidLearningPath(data) {
+      return data.id is string &&
+             data.userId is string &&
+             data.goal is string && data.goal.size() > 0 && data.goal.size() < 500 &&
+             data.level in ['beginner', 'intermediate', 'advanced'] &&
+             data.status in ['active', 'completed', 'paused'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidLearningStep(data) {
+      return data.id is string &&
+             data.pathId is string &&
+             data.order is int &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.status in ['locked', 'available', 'completed'];
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    match /knowledge/{docId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (isAdmin() || (isValidKnowledge(request.resource.data) && request.resource.data.userId == request.auth.uid));
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    match /feedback/{docId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /learningPaths/{pathId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid && isValidLearningPath(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      match /steps/{stepId} {
+        allow read: if isAuthenticated() && (get(/databases/$(database)/documents/learningPaths/$(pathId)).data.userId == request.auth.uid || isAdmin());
+        allow create, update, delete: if isAuthenticated() && (get(/databases/$(database)/documents/learningPaths/$(pathId)).data.userId == request.auth.uid || isAdmin()) && isValidLearningStep(request.resource.data);
+      }
+    }
+
+    function isValidMessage(data) {
+      return hasOnlyAllowedFields(['id', 'conversationId', 'role', 'content', 'type', 'metadata', 'createdAt']) &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 10000 &&
+             data.role in ['user', 'model'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidConversation(data) {
+      return hasOnlyAllowedFields(['id', 'title', 'userId', 'createdAt']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.userId is string &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidConversationUpdate(data) {
+      return data.diff(resource.data).affectedKeys().hasOnly(['title']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100;
+    }
+
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) && isValidConversation(request.resource.data);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin()) && isValidConversationUpdate(request.resource.data);
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId == request.auth.uid || isAdmin());
+        allow create: if isAuthenticated() && get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId == request.auth.uid && isValidMessage(request.resource.data);
+      }
+    }
+    function isValidSharedNote(data) {
+      return hasOnlyAllowedFields(['id', 'userId', 'authorName', 'topic', 'content', 'upvotes', 'createdAt']) &&
+             data.id is string &&
+             data.userId is string &&
+             data.authorName is string && data.authorName.size() > 0 && data.authorName.size() < 100 &&
+             data.topic is string && data.topic.size() > 0 && data.topic.size() < 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 50000 &&
+             data.upvotes is int &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidSharedNoteVote(data) {
+      return hasOnlyAllowedFields(['userId', 'noteId', 'value']) &&
+             data.userId is string &&
+             data.noteId is string &&
+             data.value in [1, -1];
+    }
+
+    match /sharedNotes/{noteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) && isValidSharedNote(request.resource.data) && request.resource.data.upvotes == 0;
+      allow update: if isAuthenticated() && (
+        (isOwner(resource.data.userId) && isValidSharedNote(request.resource.data) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['topic', 'content']) && request.resource.data.upvotes == resource.data.upvotes) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes']) && math.abs(request.resource.data.upvotes - resource.data.upvotes) == 1 && (
+           (request.resource.data.upvotes > resource.data.upvotes && !exists(/databases/$(database)/documents/sharedNoteVotes/$(request.auth.uid + '_' + noteId)) && getAfter(/databases/$(database)/documents/sharedNoteVotes/$(request.auth.uid + '_' + noteId)) != null) ||
+           (request.resource.data.upvotes < resource.data.upvotes && exists(/databases/$(database)/documents/sharedNoteVotes/$(request.auth.uid + '_' + noteId)) && getAfter(/databases/$(database)/documents/sharedNoteVotes/$(request.auth.uid + '_' + noteId)) == null)
+        )) || isAdmin()
+      );
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    match /sharedNoteVotes/{voteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && voteId == request.auth.uid + '_' + request.resource.data.noteId && isOwner(request.resource.data.userId) && isValidSharedNoteVote(request.resource.data);
+      allow delete: if isAuthenticated() && voteId == request.auth.uid + '_' + resource.data.noteId && isOwner(resource.data.userId);
+    }
+  }
+}

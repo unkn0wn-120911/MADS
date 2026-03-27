@@ -1,0 +1,5 @@
+{
+  "name": "MADS – God-Level Personal AI Learning System",
+  "description": "A highly intelligent private tutor capable of teaching, explaining, researching, and solving problems across all academic subjects with deep reasoning and visual aids.",
+  "requestFramePermissions": ["camera", "microphone"]
+}
