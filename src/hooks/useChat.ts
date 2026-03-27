@@ -22,7 +22,14 @@ import {
   updateDoc,
   deleteDoc
 } from 'firebase/firestore';
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
+import { 
+  signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
+  GoogleAuthProvider, 
+  onAuthStateChanged, 
+  signOut 
+} from 'firebase/auth';
 
 export interface Message {
   id: string;
@@ -105,6 +112,13 @@ export function useChat() {
       }
       setIsAuthReady(true);
     });
+
+    // Handle redirect result
+    getRedirectResult(auth).catch((e) => {
+      console.error("Redirect login error", e);
+      setError("Login failed. Please try again.");
+    });
+
     return () => unsubscribe();
   }, []);
 
@@ -357,7 +371,19 @@ export function useChat() {
   const login = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      // Try popup first
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (popupErr: any) {
+        console.warn("Popup blocked or failed, trying redirect", popupErr);
+        // If popup is blocked or not supported, try redirect
+        if (popupErr.code === 'auth/popup-blocked' || 
+            popupErr.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(auth, provider);
+        } else {
+          throw popupErr;
+        }
+      }
       return true;
     } catch (e) {
       console.error(e);

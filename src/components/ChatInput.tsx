@@ -121,10 +121,13 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSend, isLoadi
   }, [input]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 pb-2 sm:pb-4">
-      {/* Main Input */}
-      <div className="flex items-end gap-2 sm:gap-3">
-        <div className="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all flex flex-col">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pb-4 sm:pb-8">
+      {/* Main Input Container */}
+      <div className="relative group">
+        <div className={cn(
+          "bg-white border border-gray-200 rounded-[2rem] shadow-lg focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden",
+          isLoading && "opacity-80 grayscale-[0.2]"
+        )}>
           <textarea
             ref={textareaRef}
             rows={1}
@@ -132,31 +135,35 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSend, isLoadi
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full bg-transparent border-none focus:ring-0 text-gray-900 placeholder:text-gray-400 py-3 px-3 sm:px-4 resize-none max-h-[150px] sm:max-h-[200px] text-sm sm:text-base"
+            className="w-full bg-transparent border-none focus:ring-0 text-gray-900 placeholder:text-gray-400 py-4 px-6 resize-none max-h-[150px] sm:max-h-[250px] text-base leading-relaxed"
           />
           
-          <div className="flex items-center justify-between px-2 sm:px-3 pb-2 pt-1">
-            <div className="flex items-center gap-0.5 sm:gap-1">
+          <div className="flex items-center justify-between px-4 pb-3 pt-1">
+            <div className="flex items-center gap-1">
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 hover:text-gray-700"
+                className="p-2.5 hover:bg-gray-100 rounded-full transition-all text-gray-500 hover:text-blue-600 active:scale-95"
+                title="Attach file"
               >
-                <Paperclip size={18} />
+                <Paperclip size={20} />
               </button>
               <button 
                 onClick={toggleListening}
                 className={cn(
-                  "p-1.5 sm:p-2 rounded-xl transition-colors",
+                  "p-2.5 rounded-full transition-all active:scale-95",
                   isListening 
-                    ? "bg-red-100 text-red-600 hover:bg-red-200 animate-pulse" 
-                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                    ? "bg-red-50 text-red-600 hover:bg-red-100 animate-pulse" 
+                    : "hover:bg-gray-100 text-gray-500 hover:text-blue-600"
                 )}
                 title={isListening ? "Stop listening" : "Start voice input"}
               >
-                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                {isListening ? <MicOff size={20} /> : <Mic size={20} />}
               </button>
-              <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 hover:text-gray-700 hidden sm:block">
-                <Camera size={18} />
+              <button className="p-2.5 hover:bg-gray-100 rounded-full transition-all text-gray-500 hover:text-blue-600 active:scale-95 hidden sm:block">
+                <Camera size={20} />
+              </button>
+              <button className="p-2.5 hover:bg-gray-100 rounded-full transition-all text-gray-500 hover:text-blue-600 active:scale-95 hidden sm:block">
+                <Sparkles size={20} />
               </button>
             </div>
             
@@ -164,13 +171,13 @@ const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(({ onSend, isLoadi
               onClick={handleSend}
               disabled={isLoading || (!input.trim() && files.length === 0)}
               className={cn(
-                "p-2 sm:p-2.5 rounded-xl flex items-center justify-center transition-all duration-200",
+                "w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 transform active:scale-90",
                 (input.trim() || files.length > 0) && !isLoading
-                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-blue-500/30"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
               )}
             >
-              <Send size={18} className="ml-0.5" />
+              <Send size={20} className={cn("transition-transform", (input.trim() || files.length > 0) && "translate-x-0.5 -translate-y-0.5")} />
             </button>
           </div>
         </div>

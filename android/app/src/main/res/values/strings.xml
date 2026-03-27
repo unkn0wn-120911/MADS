@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MADS</string>
+    <string name="title_activity_main">MADS</string>
+    <string name="package_name">com.mads.neuralcore</string>
+    <string name="custom_url_scheme">com.mads.neuralcore</string>
+</resources>

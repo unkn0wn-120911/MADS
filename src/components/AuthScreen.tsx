@@ -35,17 +35,26 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin, onSignup }) => {
         className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-10 relative z-10 border border-gray-200 shadow-xl"
       >
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-600/20 relative group">
-            <BrainCircuit size={32} className="text-white relative z-10" />
+          <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-600/20 relative group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700"></div>
+            <BrainCircuit size={40} className="text-white relative z-10" />
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute inset-0 bg-white/20 blur-xl"
+            />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">MADS AI</h1>
-          <p className="text-blue-600 text-xs font-semibold uppercase tracking-widest mt-2">Neural Core v3.1</p>
+          <p className="text-blue-600 text-xs font-bold uppercase tracking-[0.2em] mt-2">Neural Core v3.1</p>
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 bg-gray-50 border border-gray-100 rounded-2xl text-center">
-            <p className="text-gray-600 text-sm leading-relaxed">
+          <div className="p-6 bg-blue-50/50 border border-blue-100/50 rounded-2xl text-center">
+            <p className="text-gray-700 text-sm leading-relaxed">
               Welcome to the Master Academic Deep-learning System. Please sign in with your Google account to access the neural network.
+            </p>
+            <p className="text-[10px] text-blue-500 mt-3 font-medium">
+              Note: If you're using the mobile app, a browser window will open for secure authentication.
             </p>
           </div>
 

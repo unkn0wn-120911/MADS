@@ -192,7 +192,7 @@ const App: React.FC = () => {
                         e.stopPropagation();
                         deleteConversation(conv.id);
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all"
                       title="Delete conversation"
                     >
                       <Trash2 size={14} />
@@ -398,9 +398,9 @@ const App: React.FC = () => {
               activePath={activePath}
               activeSteps={activeSteps}
               onSetActivePath={setActivePath}
-              onCreatePath={handleCreateLearningPath}
-              onUpdateStep={handleUpdateStepStatus}
-              onDeletePath={handleDeleteLearningPath}
+              onCreatePath={createLearningPath}
+              onUpdateStep={updateStepStatus}
+              onDeletePath={deleteLearningPath}
               isLoading={isLoading}
             />
           </motion.aside>
