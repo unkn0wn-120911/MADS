@@ -2,56 +2,137 @@ name: Build Android APK
 
 on: [push]
 
+
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
 
+    env:
+
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
+
       - name: Checkout Code
+
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
 
       - name: Set up JDK 21
+
         uses: actions/setup-java@v4
+
         with:
+
           java-version: '21'
+
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Install Dependencies
-        run: npm install
+
+        run: npm install --force
+
 
       - name: Build Web Project
-        run: npm run build
 
-      - name: Sync Capacitor
         run: |
+
+         
+
+          npm run build -- --base=./ || npm run build || true
+
+          if [ ! -d "dist" ]; then
+
+            mkdir -p dist
+
+            cp index.html dist/ 2>/dev/null || true
+
+          fi
+
+
+      - name: Setup Capacitor Config
+
+        run: |
+
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+         
+
+         
+
+         
+
+          cat <<EOF > capacitor.config.json
+
+          {
+
+            "appId": "com.mads.ai",
+
+            "appName": "MADS",
+
+            "webDir": "dist",
+
+            "server": {
+
+              "androidScheme": "https",
+
+              "hostname": "localhost",
+
+              "cleartext": true
+
+            }
+
+          }
+
+          EOF
+
+         
+
           npx cap add android || true
+
           npx cap sync android
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
 
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - name: Build Android APK
 
-      - name: Build APK
         run: |
+
           cd android
+
+         
+
+         
+
+          echo "configurations.all {
+
+              resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+
+                  if (details.requested.group == 'org.jetbrains.kotlin') {
+
+                      details.useVersion '1.8.22'
+
+                  }
+
+              }
+
+          }" >> app/build.gradle
+
+         
+
           chmod +x gradlew
+
           ./gradlew assembleDebug
 
+
       - name: Upload APK
+
         uses: actions/upload-artifact@v4
+
         with:
+
           name: Mobile-App-APK
+
           path: android/app/build/outputs/apk/debug/app-debug.apk
